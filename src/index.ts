@@ -1,5 +1,5 @@
 import { AuthLogParams, LogEntry } from './types';
-import { getDb } from './firebase';
+import { getDb, getProjectId } from './firebase';
 
 /**
  * Logs an authentication event to the 'sabi_audit_logs' collection.
@@ -21,10 +21,16 @@ export async function logAuthEvent(
         metadata: metadata || {},
     };
 
+    console.log(`🔍 [sabi-logger] Attempting to log event:`, JSON.stringify(logEntry, null, 2));
+    console.log(`🔍 [sabi-logger] Target collection: sabi_audit_logs`);
+    console.log(`🔍 [sabi-logger] Database project: ${getProjectId() || 'UNKNOWN'}`);
+
     try {
-        await db.collection('sabi_audit_logs').add(logEntry);
+        const docRef = await db.collection('sabi_audit_logs').add(logEntry);
+        console.log(`✅ [sabi-logger] Firestore Write Confirmed! Doc ID: ${docRef.id}`);
     } catch (error) {
-        console.error(`[sabi-logger] Failed to log auth event:`, error);
+        console.error(`❌ [sabi-logger] Failed to log auth event:`, error);
+        throw error; // Re-throw to see if this is being caught upstream
     }
 }
 
