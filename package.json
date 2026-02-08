@@ -1,6 +1,6 @@
 {
   "name": "@stefanasemota/sabi-logger",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Generic FADP/GDPR compliance logging library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
