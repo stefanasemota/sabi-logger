@@ -1,3 +1,5 @@
+const SABI_LOGGER_VERSION = "2.0.4";
+console.log(`[Sabi-Logger] v${SABI_LOGGER_VERSION} module loaded.`);
 
 import * as admin from 'firebase-admin';
 
@@ -5,10 +7,10 @@ class FirebaseService {
     private static instance: FirebaseService;
     private db: admin.firestore.Firestore;
     private app: admin.app.App;
-    private static version: string = "2.0.3";
+    private static version: string = SABI_LOGGER_VERSION;
 
     private constructor() {
-        console.log(`[Sabi-Logger] v${FirebaseService.version} initialized.`);
+        console.log(`[Sabi-Logger] v${FirebaseService.version} instance initializing...`);
         const appName = 'sabi-logger';
         let app: admin.app.App;
 
