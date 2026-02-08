@@ -1,12 +1,15 @@
-# @stefanasemota/sabi-logger
+  # @stefanasemota/sabi-logger
 
 A generic, FADP/GDPR-compliant logging library for Node.js applications using Firestore. This library provides a standardized way to log authentication and system events to a `sabi_audit_logs` collection.
+
+**Version 2.0.0 Update**: This library now acts as a standalone centralized hub. It manages its own Firebase connection internally, removing the need for dependency injection from the host application.
 
 ## Features
 
 - **Auth Logging**: dedicated `logAuthEvent` for user sessions (Login, Logout, etc.).
 - **System Logging**: generic `logSystemEvent` for backend processes (Webhooks, cron jobs, etc.).
-- **Dependency Injection**: Accepts any Firestore-like object, avoiding direct `firebase-admin` version conflicts.
+- **Standalone Hub**: Internally initializes its own Firebase Admin SDK instance to ensure connectivity independent of the host app.
+- **Connectivity Check**: `verifyLoggerConnectivity` for self-diagnosis.
 - **TypeScript Support**: Fully typed with `AuthLogParams` and `LogEntry` interfaces.
 
 ## Installation
@@ -15,17 +18,18 @@ A generic, FADP/GDPR-compliant logging library for Node.js applications using Fi
 npm install @stefanasemota/sabi-logger
 ```
 
+## Configuration
+
+The logger initializes its own Firebase Admin SDK. You must ensure the environment provides valid credentials (e.g., `GOOGLE_APPLICATION_CREDENTIALS` or default service account path) that allow writing to the `sabi_audit_logs` collection.
+
 ## Usage
 
 ### Authentication Events
 
 ```typescript
 import { logAuthEvent } from '@stefanasemota/sabi-logger';
-import { getFirestore } from 'firebase-admin/firestore'; // or your preferred generic provider
 
-const db = getFirestore();
-
-await logAuthEvent(db, {
+await logAuthEvent({
   uid: 'user_123',
   appId: 'my-saas-app',
   eventType: 'LOGIN',
@@ -41,12 +45,21 @@ await logAuthEvent(db, {
 ```typescript
 import { logSystemEvent } from '@stefanasemota/sabi-logger';
 
-await logSystemEvent(db, 'my-saas-app', 'Stripe Webhook received for subscription_created', 'INFO');
+await logSystemEvent('my-saas-app', 'Stripe Webhook received for subscription_created', 'INFO');
 ```
 
-## Configuration
+### Verify Connectivity
 
-Ensure your Firestore instance has write permissions to the `sabi_audit_logs` collection.
+```typescript
+import { verifyLoggerConnectivity } from '@stefanasemota/sabi-logger';
+
+try {
+  await verifyLoggerConnectivity('my-saas-app');
+  console.log('Logger is online and writable');
+} catch (error) {
+  console.error('Logger is offline', error);
+}
+```
 
 ## Development
 
