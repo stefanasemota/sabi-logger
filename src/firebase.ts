@@ -5,8 +5,10 @@ class FirebaseService {
     private static instance: FirebaseService;
     private db: admin.firestore.Firestore;
     private app: admin.app.App;
+    private static version: string = "2.0.3";
 
     private constructor() {
+        console.log(`[Sabi-Logger] v${FirebaseService.version} initialized.`);
         const appName = 'sabi-logger';
         let app: admin.app.App;
 
