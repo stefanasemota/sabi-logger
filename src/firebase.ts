@@ -12,8 +12,28 @@ class FirebaseService {
         try {
             app = admin.app(appName);
         } catch (e) {
+            // Try to initialize with service account JSON from environment variable
+            let credential: admin.credential.Credential;
+
+            const serviceAccountJson = process.env.SABI_LOGGER_SERVICE_ACCOUNT;
+
+            if (serviceAccountJson) {
+                try {
+                    const serviceAccount = JSON.parse(serviceAccountJson);
+                    credential = admin.credential.cert(serviceAccount);
+                    console.log('✅ [Sabi-Logger] Initialized with service account from SABI_LOGGER_SERVICE_ACCOUNT');
+                } catch (parseError) {
+                    console.error('❌ [Sabi-Logger] Invalid Service Account JSON format.');
+                    console.error('Falling back to Application Default Credentials...');
+                    credential = admin.credential.applicationDefault();
+                }
+            } else {
+                console.log('ℹ️ [Sabi-Logger] SABI_LOGGER_SERVICE_ACCOUNT not found, using Application Default Credentials');
+                credential = admin.credential.applicationDefault();
+            }
+
             app = admin.initializeApp({
-                credential: admin.credential.applicationDefault()
+                credential
             }, appName);
         }
 
