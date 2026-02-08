@@ -5,6 +5,7 @@ import * as firebaseMod from '../firebase';
 // Mock the firebase module
 vi.mock('../firebase', () => ({
     getDb: vi.fn(),
+    getProjectId: vi.fn(),
 }));
 
 describe('sabi-logger', () => {
@@ -83,9 +84,9 @@ describe('sabi-logger', () => {
                 eventType: 'Login_Failed',
             };
 
-            await expect(logAuthEvent(params)).resolves.not.toThrow();
+            await expect(logAuthEvent(params)).rejects.toThrow('Firestore error');
             expect(consoleSpy).toHaveBeenCalledWith(
-                '[sabi-logger] Failed to log auth event:',
+                '❌ [sabi-logger] Failed to log auth event:',
                 expect.any(Error)
             );
 
